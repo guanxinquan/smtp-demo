@@ -35,6 +35,8 @@ public class SMTPServerHandler extends SimpleChannelInboundHandler<String>{
 
     private static final int DEFAULT_MAIL_MAX_SIZE = 73400320;
 
+    private static final SMTPTransfer transfer = new SMTPTransfer();
+
     private String reversePath = "";
 
     private List<String> forwardPaths;
@@ -156,8 +158,11 @@ public class SMTPServerHandler extends SimpleChannelInboundHandler<String>{
 
         writeResponse("250 Mail OK queued as mx14,QMCowED5_0Vx1fZU+qpsDA--.663S2 1425462770");
 
-        SenderMail senderMail = new SenderMail();
-        senderMail.sendMail(reversePath,forwardPaths,"localhost",data.toString());
+
+        transfer.saveMessage(reversePath,forwardPaths,data.toString());
+
+//        SenderMail senderMail = new SenderMail();
+//        senderMail.sendMail(reversePath,forwardPaths,"localhost",data.toString());
 
         //MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap(inputStream);
 
