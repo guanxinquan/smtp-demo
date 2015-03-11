@@ -71,6 +71,7 @@ public class POP3ServerHandler extends SimpleChannelInboundHandler<String>{
 
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, String msg) throws Exception {
+        System.err.println(msg);
         if(msg.toUpperCase().startsWith("CAPA")){
             writeResponse("+OK Capability list follows");
             for(String s :capa){
@@ -168,6 +169,7 @@ public class POP3ServerHandler extends SimpleChannelInboundHandler<String>{
             String line = null;
             BufferedReader br= new BufferedReader(reader);
             int contentReadLength = -1;
+            writeResponse("+OK top of message follows");
             try {
                 while ((line = br.readLine()) != null){
                     if(contentReadLength == -1 && "".equals(line)){
@@ -193,8 +195,9 @@ public class POP3ServerHandler extends SimpleChannelInboundHandler<String>{
 
                 for(int i = 0 ; i < mails.size() ; i++){
                     MailModel m = mails.get(i);
-                    writeResponse(i+" "+m.getId());
+                    writeResponse(i+1+" "+m.getId());
                 }
+                writeResponse(".");
             }else{
                 int index = Integer.valueOf(args[1]);
                 if(index < mails.size()){

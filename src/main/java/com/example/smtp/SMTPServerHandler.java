@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class SMTPServerHandler extends SimpleChannelInboundHandler<String>{
 
-    private static final String[] ehlos = {"250 mail"/*,"250-SIZE 73400320"*/};
+    private static final String[] ehlos = {"250-mail","250-AUTH LOGIN PLAIN", "250 AUTH=LOGIN PLAIN"/*,"250-SIZE 73400320"*/};
 
     private static final int DEFAULT_MAIL_MAX_SIZE = 73400320;
 
@@ -53,6 +53,10 @@ public class SMTPServerHandler extends SimpleChannelInboundHandler<String>{
 
     private ChannelHandlerContext ctx;
 
+    private boolean isUserName = false;
+
+    private boolean isPassword = false;
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         this.ctx = ctx;
@@ -68,6 +72,16 @@ public class SMTPServerHandler extends SimpleChannelInboundHandler<String>{
         System.err.println(msg);
 
         if(transaction != Transaction.DATA) {
+            if(isUserName){
+                writeResponse("334 UGFzc3dvcmQ6");
+                isUserName = false;
+                isPassword = true;
+                return;
+            }else if(isPassword){
+                isPassword = false;
+                writeResponse("235 Authentication succeeded");
+                return;
+            }
 
             if ("".equals(msg) || msg.length() < 4) {
                 writeResponse("500 Error: bad syntax");
@@ -78,7 +92,10 @@ public class SMTPServerHandler extends SimpleChannelInboundHandler<String>{
                     writeResponse(ehlo);
                 }
                 isHello = true;
-            } else if ("NOOP".equals(command)) {
+            }else if("AUTH".equals(command)){
+                writeResponse("334 dXNlcm5hbWU6");
+                isUserName = true;
+            }else if ("NOOP".equals(command)) {
                 writeResponse("250 OK");
             }else if ("RSET".equals(command)) {
                 rsetCommand();

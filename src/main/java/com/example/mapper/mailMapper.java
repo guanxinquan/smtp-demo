@@ -21,9 +21,9 @@ public interface MailMapper {
     public Integer createMail(@Param("mailboxId")Integer mailboxId,@Param("size")Integer size,@Param("content")String content);
 
 
-    @Select("select id,mailboxId,content,size from "+TABLE_NAME + "where id=#{id}")
+    @Select("select id,mailboxId,content,size from "+TABLE_NAME + " where id=#{id}")
     public MailModel selectMailById(Integer id);
 
-    @Select("select id,mailboxId,size from "+ TABLE_NAME + "where mailboxId=#{mailboxId}")
+    @Select("select id,mailboxId,size from "+ TABLE_NAME + " where mailboxId=#{mailboxId}")
     public List<MailModel> selectMails(Integer mailboxId);
 }
